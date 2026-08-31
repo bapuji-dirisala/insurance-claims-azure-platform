@@ -1,0 +1,121 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "insurance-claims-azure-platform"
+version = "0.1.0"
+description = "Dual-platform Azure DE lakehouse — the same medallion built once on Azure Databricks and once on Microsoft Fabric, governed by Unity Catalog + Microsoft Purview, deployed via Databricks Asset Bundles + Fabric deployment pipelines. Every artifact ships as code; local demo runs via Azurite + local PySpark for $0."
+readme = "README.md"
+requires-python = ">=3.11,<3.13"
+license = { file = "LICENSE" }
+authors = [
+    { name = "Bapuji Dirisala", email = "dirisala.bapuji@gmail.com" },
+]
+keywords = [
+    "data-engineering",
+    "azure",
+    "databricks",
+    "microsoft-fabric",
+    "delta-lake",
+    "unity-catalog",
+    "purview",
+    "adf",
+    "adls-gen2",
+    "insurance",
+]
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Software Development :: Libraries",
+]
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-cov>=5.0",
+    "ruff>=0.6",
+    "mypy>=1.10",
+    "pre-commit>=3.7",
+]
+# Phase 2 — synthetic P&C insurance generator (policies, claims, premiums,
+# payments). Same deterministic Faker + pandas + pyarrow pattern as every
+# other repo in the portfolio.
+generator = [
+    "faker>=27.0",
+    "pandas>=2.2",
+    "pyarrow>=16.0",
+]
+# Phase 1+ — Azure SDK + storage emulator client. Azurite emulates ADLS
+# Gen2 locally so no Azure account is needed to run storage code paths.
+azure = [
+    "azure-storage-blob>=12.22",
+    "azure-storage-file-datalake>=12.17",
+    "azure-identity>=1.17",
+    "azure-keyvault-secrets>=4.8",
+    "azure-eventhub>=5.12",
+]
+# Phase 4+ — the local Spark + Delta Lake stack that stands in for both
+# Databricks and Microsoft Fabric Spark Notebooks. Same notebook code
+# runs identically on Databricks workspace or Fabric workspace.
+spark = [
+    "pyspark>=3.5,<4.0",
+    "delta-spark>=3.1,<4.0",
+    "deltalake>=0.19",
+]
+# Phase 11 — Power BI semantic model validation. tabular-editor-cli-style
+# tooling via the Microsoft BIM/TMDL file formats (JSON + markup); no
+# Power BI Desktop required to validate the committed semantic model.
+bi = [
+    "pandas>=2.2",
+    "duckdb>=1.0",
+]
+
+[project.scripts]
+claims-azure = "claims_azure.cli:main"
+
+[project.urls]
+Repository = "https://github.com/bapuji-dirisala/insurance-claims-azure-platform"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/claims_azure"]
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+pythonpath = ["src"]
+# Databricks / Fabric / live-Azure tests opt in explicitly via their markers.
+# Unit tests on local fixtures run by default so CI stays fast.
+addopts = "-v --strict-markers -m 'not azure and not databricks and not fabric and not spark'"
+markers = [
+    "azure: hits a real Azure subscription (never run in CI)",
+    "azurite: requires Azurite running on localhost:10000-10002",
+    "databricks: requires a reachable Databricks workspace (CE or paid)",
+    "fabric: requires a Microsoft Fabric trial workspace",
+    "spark: requires PySpark + delta-spark (opt-in; heavy install, Java 17 needed)",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+extend-exclude = ["data", "lakehouse", "terraform/.terraform", "databricks/notebooks", "fabric/notebooks", "*.md"]
+
+[tool.ruff.lint]
+select = [
+    "E", "W", "F", "I", "B", "C4", "UP", "N", "SIM",
+]
+ignore = [
+    "E501",  # line length — formatter owns it
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = ["N802"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = false
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true

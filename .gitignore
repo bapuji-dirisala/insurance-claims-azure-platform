@@ -1,0 +1,94 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+*.egg
+pip-log.txt
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Testing / coverage
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+.tox/
+.mypy_cache/
+.ruff_cache/
+
+# Notebooks (Databricks + Fabric) — commit source .py / .ipynb but not
+# the Databricks-synced caches or Fabric local caches.
+.databricks/
+.fabric/
+.ipynb_checkpoints/
+
+# IDE / editors
+.idea/
+.vscode/
+.cursor/
+*.swp
+*~
+
+# Learning / experimentation scratch space — never committed
+scratch/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Data — generated Parquet, local lakehouse state
+data/
+lakehouse/
+onelake/
+*.parquet
+*.duckdb
+*.db
+*.sqlite
+*.sqlite3
+!tests/**/*.parquet
+!tests/**/*.csv
+
+# Terraform
+terraform/.terraform/
+terraform/.terraform.lock.hcl
+*.tfstate
+*.tfstate.*
+*.tfplan
+terraform.tfvars
+terraform.tfvars.json
+*.auto.tfvars
+*.auto.tfvars.json
+.terraform.d/
+
+# Azurite local emulator state
+__azurite_db*__.json
+__blobstorage__/
+__queuestorage__/
+__table__/
+
+# Secrets — Azure service principal creds, Databricks PATs, etc.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.pfx
+secrets/
+credentials/
+
+# Databricks CLI config / profiles (if a reader runs against a real workspace)
+.databrickscfg
+
+# Logs
+*.log
+logs/
