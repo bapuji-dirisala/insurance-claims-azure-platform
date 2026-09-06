@@ -12,7 +12,7 @@
 > Databricks Asset Bundles + Fabric deployment pipelines promote
 > through dev → staging → prod via Azure DevOps.
 
-**Status (2026-10-25):** Phase 0 — scaffolding, tooling, CI — shipped.
+**Status (2026-10-25):** Phase 1 shipped — Azure baseline (RG + ADLS Gen2 with hierarchical namespace + three medallion containers + Key Vault in RBAC mode + three hand-scoped user-assigned managed identities for ADF/Databricks/Fabric) via Terraform, `validate`-green locally and in CI.
 
 ## Why this project
 
@@ -77,7 +77,7 @@ a reader with Azure credits can `terraform apply` them unchanged.
 | #  | Phase                                          | Doc                                                           | Status      |
 |----|------------------------------------------------|---------------------------------------------------------------|-------------|
 | 0  | Scaffolding, tooling, CI                       | [docs/phase-00-scaffolding.md](docs/phase-00-scaffolding.md)  | shipped     |
-| 1  | Azure baseline (Terraform) — RG, ADLS Gen2, Key Vault, Entra MI, workspace shells | *coming soon*          | planned     |
+| 1  | Azure baseline (Terraform) — RG, ADLS Gen2, Key Vault, Entra MI, workspace shells | [docs/phase-01-azure-baseline.md](docs/phase-01-azure-baseline.md) | shipped     |
 | 2  | Synthetic P&C generator — policies, endorsements, claims, payments, premiums | *coming soon*             | planned     |
 | 3  | ADF ingestion — simulated SFTP + Azure SQL → ADLS Gen2 bronze | *coming soon*                                 | planned     |
 | 4  | Databricks medallion — bronze → silver (SCD2 dims) → gold (fact tables) | *coming soon*                       | planned     |

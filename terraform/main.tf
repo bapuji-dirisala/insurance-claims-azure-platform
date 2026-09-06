@@ -1,0 +1,55 @@
+// Random suffix for globally-unique names (storage accounts, Key Vault)
+// when the operator didn't pin one via `resource_suffix`.
+resource "random_id" "suffix" {
+  byte_length = 3
+}
+
+locals {
+  suffix       = var.resource_suffix != "" ? var.resource_suffix : random_id.suffix.hex
+  name_prefix  = "${var.project}-${var.environment}"
+  short_prefix = "${substr(var.project, 0, 6)}${substr(var.environment, 0, 4)}"
+
+  common_tags = {
+    Project     = var.project
+    Environment = var.environment
+    ManagedBy   = "terraform"
+    Phase       = "1-azure-baseline"
+    Repository  = "insurance-claims-azure-platform"
+  }
+}
+
+// Single resource group holds the whole demo stack. Real deployments
+// typically split into {network, data, compute} RGs — the HCL is organized
+// so adding more RGs is a one-line change in the module calls.
+resource "azurerm_resource_group" "main" {
+  name     = "${local.name_prefix}-rg-${local.suffix}"
+  location = var.azure_region
+  tags     = local.common_tags
+}
+
+module "storage_lakehouse" {
+  source = "./modules/storage-lakehouse"
+
+  resource_group_name = azurerm_resource_group.main.name
+  location            = azurerm_resource_group.main.location
+  short_prefix        = local.short_prefix
+  suffix              = local.suffix
+  retention_days      = var.retention_days
+  tags                = local.common_tags
+}
+
+module "identity_baseline" {
+  source = "./modules/identity-baseline"
+
+  resource_group_name = azurerm_resource_group.main.name
+  location            = azurerm_resource_group.main.location
+  name_prefix         = local.name_prefix
+  suffix              = local.suffix
+  tenant_id           = var.tenant_id
+  principal_object_id = var.principal_object_id
+  storage_account_id  = module.storage_lakehouse.storage_account_id
+  bronze_container_id = module.storage_lakehouse.bronze_container_id
+  silver_container_id = module.storage_lakehouse.silver_container_id
+  gold_container_id   = module.storage_lakehouse.gold_container_id
+  tags                = local.common_tags
+}

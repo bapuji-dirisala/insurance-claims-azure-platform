@@ -1,0 +1,23 @@
+// Remote state on Azure Storage. Copy to backend.tf and run
+//   terraform init -migrate-state
+// after bootstrapping the storage account by hand:
+//
+//   az group create --name tfstate-rg --location eastus
+//   az storage account create \
+//     --name claimstfstate$(openssl rand -hex 3) \
+//     --resource-group tfstate-rg \
+//     --location eastus \
+//     --sku Standard_LRS
+//   az storage container create \
+//     --name tfstate \
+//     --account-name claimstfstate...
+//
+// terraform {
+//   backend "azurerm" {
+//     resource_group_name  = "tfstate-rg"
+//     storage_account_name = "claimstfstate..."
+//     container_name       = "tfstate"
+//     key                  = "insurance-claims-azure-platform.tfstate"
+//     use_azuread_auth     = true
+//   }
+// }

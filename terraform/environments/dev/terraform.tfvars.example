@@ -1,0 +1,16 @@
+// Example dev configuration. Copy to terraform.tfvars and fill in your
+// own subscription + tenant GUIDs + Entra ID object ID. Never commit the
+// filled-in version — real GUIDs trip secret-scanning noise and are
+// account-identifying.
+
+project             = "claims"
+environment         = "dev"
+azure_region        = "eastus"
+use_local_backend   = false
+
+# Required when use_local_backend = false:
+# subscription_id     = "00000000-0000-0000-0000-000000000000"
+# tenant_id           = "00000000-0000-0000-0000-000000000000"
+# principal_object_id = "00000000-0000-0000-0000-000000000000"
+
+retention_days = 90
