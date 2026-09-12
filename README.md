@@ -12,7 +12,7 @@
 > Databricks Asset Bundles + Fabric deployment pipelines promote
 > through dev → staging → prod via Azure DevOps.
 
-**Status (2026-10-25):** Phase 2 shipped — synthetic P&C generator ships six bronze-ready Parquet datasets (parties, policies, endorsements, claims, payments, premiums) with full referential integrity + domain invariants (loss date in term, paid ≤ incurred, denied = 0 paid), deterministic by seed, written in the exact Hive partition layout Databricks + Fabric pick up for pruning.
+**Status (2026-10-25):** Phase 3 shipped — ADF ingestion wired end-to-end: two committed pipelines (SFTP partner CSV + Azure SQL incremental watermark) landing in ADLS Gen2 bronze; every credential routes through Key Vault + Managed Identity; a local Python emulator produces the same Parquet layout against Azurite for the $0 demo path.
 
 ## Why this project
 
@@ -79,7 +79,7 @@ a reader with Azure credits can `terraform apply` them unchanged.
 | 0  | Scaffolding, tooling, CI                       | [docs/phase-00-scaffolding.md](docs/phase-00-scaffolding.md)  | shipped     |
 | 1  | Azure baseline (Terraform) — RG, ADLS Gen2, Key Vault, Entra MI, workspace shells | [docs/phase-01-azure-baseline.md](docs/phase-01-azure-baseline.md) | shipped     |
 | 2  | Synthetic P&C generator — policies, endorsements, claims, payments, premiums | [docs/phase-02-generator.md](docs/phase-02-generator.md) | shipped     |
-| 3  | ADF ingestion — simulated SFTP + Azure SQL → ADLS Gen2 bronze | *coming soon*                                 | planned     |
+| 3  | ADF ingestion — simulated SFTP + Azure SQL → ADLS Gen2 bronze | [docs/phase-03-adf-ingestion.md](docs/phase-03-adf-ingestion.md) | shipped     |
 | 4  | Databricks medallion — bronze → silver (SCD2 dims) → gold (fact tables) | *coming soon*                       | planned     |
 | 5  | Unity Catalog governance — 3-level namespace, row filters on PII, LF-style tag grants | *coming soon*         | planned     |
 | 6  | Databricks Asset Bundles — dev / staging / prod deploys via Azure DevOps | *coming soon*                      | planned     |

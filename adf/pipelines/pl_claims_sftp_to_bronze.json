@@ -1,0 +1,88 @@
+{
+  "name": "pl_claims_sftp_to_bronze",
+  "properties": {
+    "description": "Daily partner claims drop → bronze. GetMetadata lists files; ForEach copies each one; Delete-on-success archives via a lifecycle rule rather than delete.",
+    "annotations": ["phase:3", "domain:claims", "source:sftp"],
+    "concurrency": 1,
+    "parameters": {
+      "loadDate": { "type": "string", "defaultValue": "@formatDateTime(utcNow(), 'yyyy-MM-dd')" }
+    },
+    "activities": [
+      {
+        "name": "ListClaimDrops",
+        "type": "GetMetadata",
+        "typeProperties": {
+          "dataset": {
+            "referenceName": "ds_sftp_claims_csv",
+            "type": "DatasetReference",
+            "parameters": { "fileName": "*.csv" }
+          },
+          "fieldList": ["childItems"]
+        }
+      },
+      {
+        "name": "ForEachFile",
+        "type": "ForEach",
+        "dependsOn": [
+          {
+            "activity": "ListClaimDrops",
+            "dependencyConditions": ["Succeeded"]
+          }
+        ],
+        "typeProperties": {
+          "items": {
+            "value": "@activity('ListClaimDrops').output.childItems",
+            "type": "Expression"
+          },
+          "isSequential": false,
+          "batchCount": 4,
+          "activities": [
+            {
+              "name": "CopyToBronze",
+              "type": "Copy",
+              "typeProperties": {
+                "source": {
+                  "type": "DelimitedTextSource",
+                  "storeSettings": { "type": "SftpReadSettings", "recursive": false }
+                },
+                "sink": {
+                  "type": "ParquetSink",
+                  "storeSettings": { "type": "AzureBlobFSWriteSettings" },
+                  "formatSettings": { "type": "ParquetWriteSettings" }
+                },
+                "enableStaging": false,
+                "parallelCopies": 2,
+                "dataIntegrationUnits": 4,
+                "translator": {
+                  "type": "TabularTranslator",
+                  "typeConversion": true,
+                  "typeConversionSettings": {
+                    "allowDataTruncation": false,
+                    "treatBooleanAsNumber": false
+                  }
+                }
+              },
+              "inputs": [
+                {
+                  "referenceName": "ds_sftp_claims_csv",
+                  "type": "DatasetReference",
+                  "parameters": { "fileName": "@item().name" }
+                }
+              ],
+              "outputs": [
+                {
+                  "referenceName": "ds_adls_bronze_parquet",
+                  "type": "DatasetReference",
+                  "parameters": {
+                    "dataset": "claims",
+                    "loadDate": "@pipeline().parameters.loadDate"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

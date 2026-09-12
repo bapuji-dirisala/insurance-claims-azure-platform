@@ -1,0 +1,20 @@
+{
+  "name": "ds_azsql_policies",
+  "properties": {
+    "linkedServiceName": { "referenceName": "ls_azsql_core", "type": "LinkedServiceReference" },
+    "annotations": [],
+    "type": "AzureSqlTable",
+    "schema": [
+      { "name": "policy_id", "type": "varchar" },
+      { "name": "party_id", "type": "varchar" },
+      { "name": "line_of_business", "type": "varchar" },
+      { "name": "effective_date", "type": "date" },
+      { "name": "expiration_date", "type": "date" },
+      { "name": "premium_annual_usd", "type": "decimal" }
+    ],
+    "typeProperties": {
+      "schema": "core",
+      "table": "policies"
+    }
+  }
+}

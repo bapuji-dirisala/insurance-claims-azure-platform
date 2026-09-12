@@ -1,0 +1,25 @@
+{
+  "name": "ds_sftp_claims_csv",
+  "properties": {
+    "linkedServiceName": { "referenceName": "ls_sftp_partner", "type": "LinkedServiceReference" },
+    "annotations": [],
+    "type": "DelimitedText",
+    "typeProperties": {
+      "location": {
+        "type": "SftpLocation",
+        "fileName": {
+          "value": "@dataset().fileName",
+          "type": "Expression"
+        },
+        "folderPath": "/claims/outbound/"
+      },
+      "columnDelimiter": ",",
+      "escapeChar": "\\",
+      "firstRowAsHeader": true,
+      "quoteChar": "\""
+    },
+    "parameters": {
+      "fileName": { "type": "string" }
+    }
+  }
+}

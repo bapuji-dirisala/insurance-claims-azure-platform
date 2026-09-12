@@ -1,0 +1,12 @@
+{
+  "name": "ls_adls_bronze",
+  "properties": {
+    "annotations": [],
+    "type": "AzureBlobFS",
+    "typeProperties": {
+      "url": "@{linkedService().bronzeUrl}",
+      "accountKind": "StorageV2"
+    },
+    "connectVia": { "referenceName": "AutoResolveIntegrationRuntime", "type": "IntegrationRuntimeReference" }
+  }
+}

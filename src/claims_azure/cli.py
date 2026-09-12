@@ -56,7 +56,39 @@ def _build_parser() -> argparse.ArgumentParser:
     gen.add_argument("--claims", type=int, default=1_000, help="Claim count.")
     gen.add_argument("--payments", type=int, default=2_500, help="Payment count.")
 
+    # Phase 3 — local ADF emulator.
+    ing = subparsers.add_parser(
+        "ingest-local",
+        help="Run an ADF pipeline locally against Azurite (same bronze layout).",
+    )
+    ing.add_argument(
+        "pipeline",
+        choices=("claims-sftp", "policies-azsql"),
+        help="Which ADF pipeline to emulate locally.",
+    )
+    ing.add_argument(
+        "--out",
+        type=Path,
+        default=Path("__blobstorage__"),
+        help="Local root directory (default: ./__blobstorage__ — Azurite's default location).",
+    )
+    ing.add_argument("--seed", type=int, default=42)
+
     return parser
+
+
+def _handle_ingest_local(args: argparse.Namespace) -> int:
+    from claims_azure.ingest.pipelines import (
+        run_claims_sftp_to_bronze,
+        run_policies_azsql_to_bronze,
+    )
+
+    if args.pipeline == "claims-sftp":
+        path = run_claims_sftp_to_bronze(seed=args.seed, local_root=args.out)
+    else:
+        path = run_policies_azsql_to_bronze(seed=args.seed, local_root=args.out)
+    print(f"  wrote → {path}")
+    return 0
 
 
 def _handle_generate(args: argparse.Namespace) -> int:
@@ -87,6 +119,8 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     if args.command == "generate":
         return _handle_generate(args)
+    if args.command == "ingest-local":
+        return _handle_ingest_local(args)
     parser.print_help()
     return 0
 

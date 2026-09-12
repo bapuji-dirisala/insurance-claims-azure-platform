@@ -1,0 +1,28 @@
+{
+  "name": "ls_sftp_partner",
+  "properties": {
+    "annotations": [],
+    "type": "Sftp",
+    "typeProperties": {
+      "host": "@linkedService().partnerSftpHost",
+      "port": 22,
+      "skipHostKeyValidation": false,
+      "hostKeyFingerprint": {
+        "type": "AzureKeyVaultSecret",
+        "store": { "referenceName": "ls_kv_main", "type": "LinkedServiceReference" },
+        "secretName": "partner-sftp-fingerprint"
+      },
+      "authenticationType": "SshPublicKey",
+      "userName": {
+        "type": "AzureKeyVaultSecret",
+        "store": { "referenceName": "ls_kv_main", "type": "LinkedServiceReference" },
+        "secretName": "partner-sftp-user"
+      },
+      "privateKeyContent": {
+        "type": "AzureKeyVaultSecret",
+        "store": { "referenceName": "ls_kv_main", "type": "LinkedServiceReference" },
+        "secretName": "partner-sftp-private-key"
+      }
+    }
+  }
+}

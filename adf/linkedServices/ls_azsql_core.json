@@ -1,0 +1,12 @@
+{
+  "name": "ls_azsql_core",
+  "properties": {
+    "annotations": [],
+    "type": "AzureSqlDatabase",
+    "typeProperties": {
+      "connectionString": "@{linkedService().connectionString}",
+      "authenticationType": "ManagedIdentity"
+    },
+    "connectVia": { "referenceName": "AutoResolveIntegrationRuntime", "type": "IntegrationRuntimeReference" }
+  }
+}

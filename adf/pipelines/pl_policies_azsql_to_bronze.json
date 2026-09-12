@@ -1,0 +1,65 @@
+{
+  "name": "pl_policies_azsql_to_bronze",
+  "properties": {
+    "description": "Incremental policy pull from Azure SQL core.policies → bronze. Watermarked via Lookup → Copy.",
+    "annotations": ["phase:3", "domain:policies", "source:azure-sql"],
+    "concurrency": 1,
+    "parameters": {
+      "loadDate": { "type": "string", "defaultValue": "@formatDateTime(utcNow(), 'yyyy-MM-dd')" }
+    },
+    "variables": {
+      "lastWatermark": { "type": "String" }
+    },
+    "activities": [
+      {
+        "name": "LookupLastWatermark",
+        "type": "Lookup",
+        "typeProperties": {
+          "dataset": { "referenceName": "ds_azsql_policies", "type": "DatasetReference" },
+          "source": {
+            "type": "AzureSqlSource",
+            "sqlReaderQuery": "SELECT COALESCE(MAX(load_watermark), '1900-01-01T00:00:00Z') AS lastRun FROM meta.pipeline_watermark WHERE pipeline_name = 'pl_policies_azsql_to_bronze'"
+          },
+          "firstRowOnly": true
+        }
+      },
+      {
+        "name": "SetWatermark",
+        "type": "SetVariable",
+        "dependsOn": [{ "activity": "LookupLastWatermark", "dependencyConditions": ["Succeeded"] }],
+        "typeProperties": {
+          "variableName": "lastWatermark",
+          "value": { "value": "@activity('LookupLastWatermark').output.firstRow.lastRun", "type": "Expression" }
+        }
+      },
+      {
+        "name": "IncrementalCopy",
+        "type": "Copy",
+        "dependsOn": [{ "activity": "SetWatermark", "dependencyConditions": ["Succeeded"] }],
+        "typeProperties": {
+          "source": {
+            "type": "AzureSqlSource",
+            "sqlReaderQuery": "SELECT * FROM core.policies WHERE modified_at > @{variables('lastWatermark')}"
+          },
+          "sink": {
+            "type": "ParquetSink",
+            "storeSettings": { "type": "AzureBlobFSWriteSettings" },
+            "formatSettings": { "type": "ParquetWriteSettings" }
+          },
+          "enableStaging": false
+        },
+        "inputs": [{ "referenceName": "ds_azsql_policies", "type": "DatasetReference" }],
+        "outputs": [
+          {
+            "referenceName": "ds_adls_bronze_parquet",
+            "type": "DatasetReference",
+            "parameters": {
+              "dataset": "policies",
+              "loadDate": "@pipeline().parameters.loadDate"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}
