@@ -48,14 +48,12 @@ jobs:
           python-version: "3.11"
           cache: pip
 
-      - name: install package with dev extras
+      - name: install package with dev + per-phase extras
         run: |
           python -m pip install --upgrade pip
-          pip install -e ".[dev]"
+          # Each phase appends its extra here. Phase 2 added [generator].
+          pip install -e ".[dev,generator]"
 
-      # Each phase that adds a new extra appends it here. Phase 0 ships
-      # the base install only; later phases add [azure], [generator],
-      # [spark], [bi] as they come online.
       - name: pytest
         run: pytest -q
 
