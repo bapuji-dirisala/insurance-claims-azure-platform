@@ -12,7 +12,7 @@
 > Databricks Asset Bundles + Fabric deployment pipelines promote
 > through dev → staging → prod via Azure DevOps.
 
-**Status (2026-10-25):** Phase 3 shipped — ADF ingestion wired end-to-end: two committed pipelines (SFTP partner CSV + Azure SQL incremental watermark) landing in ADLS Gen2 bronze; every credential routes through Key Vault + Managed Identity; a local Python emulator produces the same Parquet layout against Azurite for the $0 demo path.
+**Status (2026-10-25):** Phases 4 + 5 + 6 shipped — Databricks medallion end-to-end: three notebooks (bronze→silver SCD2 policies + silver claim fact + gold monthly loss ratio) + Unity Catalog bootstrap (3 catalogs + grants + row filter + PII column mask + governance tags) + Databricks Asset Bundle (dev/staging/prod targets with per-env catalog prefixes). DuckDB mirrors run the same logic on a laptop.
 
 ## Why this project
 
@@ -80,9 +80,9 @@ a reader with Azure credits can `terraform apply` them unchanged.
 | 1  | Azure baseline (Terraform) — RG, ADLS Gen2, Key Vault, Entra MI, workspace shells | [docs/phase-01-azure-baseline.md](docs/phase-01-azure-baseline.md) | shipped     |
 | 2  | Synthetic P&C generator — policies, endorsements, claims, payments, premiums | [docs/phase-02-generator.md](docs/phase-02-generator.md) | shipped     |
 | 3  | ADF ingestion — simulated SFTP + Azure SQL → ADLS Gen2 bronze | [docs/phase-03-adf-ingestion.md](docs/phase-03-adf-ingestion.md) | shipped     |
-| 4  | Databricks medallion — bronze → silver (SCD2 dims) → gold (fact tables) | *coming soon*                       | planned     |
-| 5  | Unity Catalog governance — 3-level namespace, row filters on PII, LF-style tag grants | *coming soon*         | planned     |
-| 6  | Databricks Asset Bundles — dev / staging / prod deploys via Azure DevOps | *coming soon*                      | planned     |
+| 4  | Databricks medallion — bronze → silver (SCD2 dims) → gold (fact tables) | [docs/phase-04-05-06-databricks-medallion.md](docs/phase-04-05-06-databricks-medallion.md) | shipped     |
+| 5  | Unity Catalog governance — 3-level namespace, row filters on PII, LF-style tag grants | [docs/phase-04-05-06-databricks-medallion.md](docs/phase-04-05-06-databricks-medallion.md) | shipped     |
+| 6  | Databricks Asset Bundles — dev / staging / prod deploys via Azure DevOps | [docs/phase-04-05-06-databricks-medallion.md](docs/phase-04-05-06-databricks-medallion.md) | shipped     |
 | 7  | Microsoft Fabric mirror — same medallion rebuilt in OneLake Lakehouse + Fabric Notebooks | *coming soon*      | planned     |
 | 8  | Fabric Warehouse + Direct Lake — gold materialized for Power BI | *coming soon*                                | planned     |
 | 9  | Microsoft Purview — end-to-end lineage across Databricks + Fabric, PII classification | *coming soon*         | planned     |

@@ -1,0 +1,98 @@
+# Databricks Asset Bundle — claims medallion.
+#
+# Three jobs, three environments. Deploy with:
+#   databricks bundle deploy --target dev
+#   databricks bundle deploy --target staging
+#   databricks bundle deploy --target prod
+#
+# Azure DevOps pipeline (azure-pipelines.yml at repo root) invokes this
+# bundle per PR branch (dev) and on main (staging + prod).
+
+bundle:
+  name: claims-medallion
+
+workspace:
+  host: ${var.databricks_host}
+
+variables:
+  databricks_host:
+    description: Databricks workspace URL (e.g. https://adb-xxx.azuredatabricks.net)
+  catalog_prefix:
+    description: Prefix for the three unity catalogs (dev → claims_bronze, prod → claims_bronze_prod).
+    default: claims
+  cluster_node_type:
+    description: Spark node type.
+    default: Standard_DS3_v2
+
+targets:
+  dev:
+    mode: development
+    default: true
+    workspace:
+      root_path: /Workspace/Users/${workspace.current_user.userName}/.bundle/claims/dev
+    variables:
+      catalog_prefix: claims
+
+  staging:
+    mode: production
+    workspace:
+      root_path: /Workspace/Shared/.bundle/claims/staging
+    variables:
+      catalog_prefix: claims_staging
+
+  prod:
+    mode: production
+    workspace:
+      root_path: /Workspace/Shared/.bundle/claims/prod
+    variables:
+      catalog_prefix: claims_prod
+      cluster_node_type: Standard_DS4_v2
+
+resources:
+  jobs:
+    claims_medallion:
+      name: claims-medallion-${bundle.target}
+      email_notifications:
+        on_failure: ["data-platform-alerts@example.com"]
+      schedule:
+        quartz_cron_expression: "0 15 2 * * ?"  # daily 02:15 UTC
+        timezone_id: UTC
+      max_concurrent_runs: 1
+      job_clusters:
+        - job_cluster_key: medallion_cluster
+          new_cluster:
+            spark_version: 15.4.x-scala2.12
+            node_type_id: ${var.cluster_node_type}
+            num_workers: 2
+            data_security_mode: SINGLE_USER
+            spark_conf:
+              spark.databricks.delta.properties.defaults.enableChangeDataFeed: "true"
+      tasks:
+        - task_key: bronze_to_silver_policies_scd2
+          job_cluster_key: medallion_cluster
+          notebook_task:
+            notebook_path: ../notebooks/01_bronze_to_silver_policies_scd2.py
+            base_parameters:
+              bronze_catalog: ${var.catalog_prefix}_bronze
+              silver_catalog: ${var.catalog_prefix}_silver
+
+        - task_key: bronze_to_silver_claims_fact
+          job_cluster_key: medallion_cluster
+          depends_on:
+            - task_key: bronze_to_silver_policies_scd2
+          notebook_task:
+            notebook_path: ../notebooks/02_bronze_to_silver_claims_fact.py
+            base_parameters:
+              bronze_catalog: ${var.catalog_prefix}_bronze
+              silver_catalog: ${var.catalog_prefix}_silver
+
+        - task_key: silver_to_gold_loss_ratio
+          job_cluster_key: medallion_cluster
+          depends_on:
+            - task_key: bronze_to_silver_claims_fact
+          notebook_task:
+            notebook_path: ../notebooks/03_silver_to_gold_loss_ratio.py
+            base_parameters:
+              bronze_catalog: ${var.catalog_prefix}_bronze
+              silver_catalog: ${var.catalog_prefix}_silver
+              gold_catalog: ${var.catalog_prefix}_gold
