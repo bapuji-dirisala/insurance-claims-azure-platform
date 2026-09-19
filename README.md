@@ -12,7 +12,7 @@
 > Databricks Asset Bundles + Fabric deployment pipelines promote
 > through dev → staging → prod via Azure DevOps.
 
-**Status (2026-10-25):** Phases 4 + 5 + 6 shipped — Databricks medallion end-to-end: three notebooks (bronze→silver SCD2 policies + silver claim fact + gold monthly loss ratio) + Unity Catalog bootstrap (3 catalogs + grants + row filter + PII column mask + governance tags) + Databricks Asset Bundle (dev/staging/prod targets with per-env catalog prefixes). DuckDB mirrors run the same logic on a laptop.
+**Status (2026-10-25):** Phases 7 + 8 shipped — Microsoft Fabric Lakehouse mirror (OneLake shortcuts into the ADLS medallion, zero-copy) + Fabric Warehouse star schema (T-SQL `OPENROWSET BULK ... FORMAT='DELTA'` loads) so Power BI can hit the same medallion via Direct Lake (Lakehouse) or Import mode (Warehouse). DuckDB mirrors run the same aggregations on a laptop.
 
 ## Why this project
 
@@ -83,8 +83,8 @@ a reader with Azure credits can `terraform apply` them unchanged.
 | 4  | Databricks medallion — bronze → silver (SCD2 dims) → gold (fact tables) | [docs/phase-04-05-06-databricks-medallion.md](docs/phase-04-05-06-databricks-medallion.md) | shipped     |
 | 5  | Unity Catalog governance — 3-level namespace, row filters on PII, LF-style tag grants | [docs/phase-04-05-06-databricks-medallion.md](docs/phase-04-05-06-databricks-medallion.md) | shipped     |
 | 6  | Databricks Asset Bundles — dev / staging / prod deploys via Azure DevOps | [docs/phase-04-05-06-databricks-medallion.md](docs/phase-04-05-06-databricks-medallion.md) | shipped     |
-| 7  | Microsoft Fabric mirror — same medallion rebuilt in OneLake Lakehouse + Fabric Notebooks | *coming soon*      | planned     |
-| 8  | Fabric Warehouse + Direct Lake — gold materialized for Power BI | *coming soon*                                | planned     |
+| 7  | Microsoft Fabric mirror — same medallion rebuilt in OneLake Lakehouse + Fabric Notebooks | [docs/phase-07-08-fabric-lakehouse-warehouse.md](docs/phase-07-08-fabric-lakehouse-warehouse.md) | shipped |
+| 8  | Fabric Warehouse + Direct Lake — gold materialized for Power BI | [docs/phase-07-08-fabric-lakehouse-warehouse.md](docs/phase-07-08-fabric-lakehouse-warehouse.md) | shipped |
 | 9  | Microsoft Purview — end-to-end lineage across Databricks + Fabric, PII classification | *coming soon*         | planned     |
 | 10 | Event Hubs streaming — real-time claim payments → Structured Streaming → Delta | *coming soon*                 | planned     |
 | 11 | Power BI semantic model — loss ratio, combined ratio, IBNR dashboard | *coming soon*                            | planned     |
