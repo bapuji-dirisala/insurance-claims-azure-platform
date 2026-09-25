@@ -1,0 +1,24 @@
+{
+  "adls_gen2_scan": {
+    "dataSource": "stclaimslakehouse",
+    "collection": "claims-platform",
+    "scanRuleSet": "AdlsGen2",
+    "schedule": "0 2 * * *",
+    "fileTypes": ["Parquet", "Delta", "Csv", "Json"],
+    "note": "Nightly scan at 02:00 UTC — pulls dataset schemas + classification into the data map."
+  },
+  "databricks_unity_scan": {
+    "dataSource": "claims-dbx-ws",
+    "collection": "claims-platform",
+    "scanRuleSet": "AzureDatabricksUnityCatalog",
+    "schedule": "0 3 * * *",
+    "note": "Pulls catalog.schema.table metadata and column-level lineage from UC query history."
+  },
+  "fabric_lakehouse_scan": {
+    "dataSource": "claims-fabric-ws",
+    "collection": "claims-platform",
+    "scanRuleSet": "Fabric",
+    "schedule": "0 4 * * *",
+    "note": "Captures OneLake shortcuts + Lakehouse Delta tables + Warehouse schema."
+  }
+}

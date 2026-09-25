@@ -12,7 +12,7 @@
 > Databricks Asset Bundles + Fabric deployment pipelines promote
 > through dev → staging → prod via Azure DevOps.
 
-**Status (2026-10-25):** Phases 7 + 8 shipped — Microsoft Fabric Lakehouse mirror (OneLake shortcuts into the ADLS medallion, zero-copy) + Fabric Warehouse star schema (T-SQL `OPENROWSET BULK ... FORMAT='DELTA'` loads) so Power BI can hit the same medallion via Direct Lake (Lakehouse) or Import mode (Warehouse). DuckDB mirrors run the same aggregations on a laptop.
+**Status (2026-10-25):** Phases 9 + 10 shipped — Microsoft Purview governance (account + MI role grants on ADLS, custom Atlas lineage payloads per Databricks notebook, collection hierarchy + nightly scan schedules) + Azure Event Hubs streaming (Standard namespace, two hubs, dedicated consumer group, Entra-ID-only auth, Databricks Structured Streaming notebook writing bronze Delta with checkpoint, local emulator for CI).
 
 ## Why this project
 
@@ -85,8 +85,8 @@ a reader with Azure credits can `terraform apply` them unchanged.
 | 6  | Databricks Asset Bundles — dev / staging / prod deploys via Azure DevOps | [docs/phase-04-05-06-databricks-medallion.md](docs/phase-04-05-06-databricks-medallion.md) | shipped     |
 | 7  | Microsoft Fabric mirror — same medallion rebuilt in OneLake Lakehouse + Fabric Notebooks | [docs/phase-07-08-fabric-lakehouse-warehouse.md](docs/phase-07-08-fabric-lakehouse-warehouse.md) | shipped |
 | 8  | Fabric Warehouse + Direct Lake — gold materialized for Power BI | [docs/phase-07-08-fabric-lakehouse-warehouse.md](docs/phase-07-08-fabric-lakehouse-warehouse.md) | shipped |
-| 9  | Microsoft Purview — end-to-end lineage across Databricks + Fabric, PII classification | *coming soon*         | planned     |
-| 10 | Event Hubs streaming — real-time claim payments → Structured Streaming → Delta | *coming soon*                 | planned     |
+| 9  | Microsoft Purview — end-to-end lineage across Databricks + Fabric, PII classification | [docs/phase-09-10-purview-eventhubs.md](docs/phase-09-10-purview-eventhubs.md) | shipped |
+| 10 | Event Hubs streaming — real-time claim payments → Structured Streaming → Delta | [docs/phase-09-10-purview-eventhubs.md](docs/phase-09-10-purview-eventhubs.md) | shipped |
 | 11 | Power BI semantic model — loss ratio, combined ratio, IBNR dashboard | *coming soon*                            | planned     |
 | 12 | Observability + docs + exposures — Azure Monitor, hosted docs, actuarial calc notes | *coming soon*          | planned     |
 

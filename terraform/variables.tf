@@ -63,3 +63,27 @@ variable "principal_object_id" {
   type        = string
   default     = null
 }
+
+variable "enable_purview" {
+  description = "Phase 9 — provision a Microsoft Purview account + MI role grants on ADLS. Off by default (slow create, nonzero cost)."
+  type        = bool
+  default     = false
+}
+
+variable "enable_eventhubs" {
+  description = "Phase 10 — provision Event Hubs namespace + hubs + consumer group."
+  type        = bool
+  default     = false
+}
+
+variable "eventhubs_partition_count" {
+  description = "Partitions per hub (default 4)."
+  type        = number
+  default     = 4
+}
+
+variable "eventhubs_producer_mi_principal_id" {
+  description = "Principal ID of whichever MI publishes payment events. Empty = skip the sender role grant."
+  type        = string
+  default     = ""
+}

@@ -1,0 +1,23 @@
+[
+  {
+    "name": "claims-platform",
+    "friendlyName": "Claims Platform",
+    "description": "P&C claims medallion — Databricks + Fabric + ADLS Gen2.",
+    "parentCollection": {"referenceName": "root"}
+  },
+  {
+    "name": "claims-platform-bronze",
+    "friendlyName": "Bronze — raw ingest",
+    "parentCollection": {"referenceName": "claims-platform"}
+  },
+  {
+    "name": "claims-platform-silver",
+    "friendlyName": "Silver — conformed facts and dims",
+    "parentCollection": {"referenceName": "claims-platform"}
+  },
+  {
+    "name": "claims-platform-gold",
+    "friendlyName": "Gold — actuarial marts",
+    "parentCollection": {"referenceName": "claims-platform"}
+  }
+]

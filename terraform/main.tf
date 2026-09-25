@@ -53,3 +53,34 @@ module "identity_baseline" {
   gold_container_id   = module.storage_lakehouse.gold_container_id
   tags                = local.common_tags
 }
+
+// Phase 9 — Microsoft Purview governance account.
+// Gated on var.enable_purview because Purview provisions a managed
+// resource group under the hood (slow + nonzero cost) and we don't
+// always want that in `terraform plan` smoke tests.
+module "purview" {
+  count  = var.enable_purview ? 1 : 0
+  source = "./modules/purview"
+
+  name_prefix         = local.short_prefix
+  suffix              = local.suffix
+  resource_group_name = azurerm_resource_group.main.name
+  location            = azurerm_resource_group.main.location
+  adls_account_id     = module.storage_lakehouse.storage_account_id
+  tags                = local.common_tags
+}
+
+// Phase 10 — Event Hubs for real-time claim-payment events.
+module "eventhubs" {
+  count  = var.enable_eventhubs ? 1 : 0
+  source = "./modules/eventhubs"
+
+  name_prefix                = local.short_prefix
+  suffix                     = local.suffix
+  resource_group_name        = azurerm_resource_group.main.name
+  location                   = azurerm_resource_group.main.location
+  partition_count            = var.eventhubs_partition_count
+  databricks_mi_principal_id = module.identity_baseline.databricks_identity_principal_id
+  producer_mi_principal_id   = var.eventhubs_producer_mi_principal_id
+  tags                       = local.common_tags
+}
