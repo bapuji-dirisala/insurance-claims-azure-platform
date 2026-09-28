@@ -84,3 +84,19 @@ module "eventhubs" {
   producer_mi_principal_id   = var.eventhubs_producer_mi_principal_id
   tags                       = local.common_tags
 }
+
+// Phase 12 — Azure Monitor + Log Analytics + alerts.
+module "observability" {
+  count  = var.enable_observability ? 1 : 0
+  source = "./modules/observability"
+
+  name_prefix           = local.short_prefix
+  suffix                = local.suffix
+  resource_group_name   = azurerm_resource_group.main.name
+  location              = azurerm_resource_group.main.location
+  adls_account_id       = module.storage_lakehouse.storage_account_id
+  eventhub_namespace_id = var.enable_eventhubs ? module.eventhubs[0].namespace_id : ""
+  retention_days        = var.observability_retention_days
+  ops_email             = var.observability_ops_email
+  tags                  = local.common_tags
+}

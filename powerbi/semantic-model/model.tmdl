@@ -1,0 +1,77 @@
+// Tabular Model Definition Language (TMDL) — Power BI / Fabric
+// semantic model. Direct Lake mode binds to the Fabric Lakehouse Delta
+// table `gold_monthly_loss_ratio` built by `fabric/notebooks/02_silver_to_gold_lakehouse.py`.
+//
+// Source-controlled TMDL means the semantic model is a reviewable
+// artifact — no .pbix in the repo.
+
+model Claims_Actuarial
+    culture: en-US
+    defaultPowerBIDataSourceVersion: powerBI_V3
+    discourageImplicitMeasures: true
+
+ref table Date = 'date_dim'
+ref table Policy = 'policy_dim'
+ref table LossRatio = 'gold_monthly_loss_ratio'
+
+table 'gold_monthly_loss_ratio'
+    column month
+        dataType: dateTime
+        formatString: yyyy-mm
+        summarizeBy: none
+    column lob
+        dataType: string
+        summarizeBy: none
+    column losses_paid
+        dataType: decimal
+        formatString: $#,0.00
+        summarizeBy: sum
+    column losses_reserved
+        dataType: decimal
+        formatString: $#,0.00
+        summarizeBy: sum
+    column premium_earned
+        dataType: decimal
+        formatString: $#,0.00
+        summarizeBy: sum
+    column loss_ratio
+        dataType: double
+        formatString: 0.00%
+        summarizeBy: average
+
+    partition DirectLake = entity
+        mode: directLake
+        source
+            lakehouse: 'claims_lakehouse'
+            schema: 'dbo'
+            entityName: 'gold_monthly_loss_ratio'
+
+measure 'Loss Ratio' =
+        DIVIDE(
+            SUMX(LossRatio, LossRatio[losses_paid] + LossRatio[losses_reserved]),
+            SUM(LossRatio[premium_earned])
+        )
+    formatString: 0.00%
+
+measure 'Combined Ratio' =
+        VAR LossRatio_ = [Loss Ratio]
+        VAR ExpenseRatio_ = 0.28  // placeholder; wire to expense fact in prod
+        RETURN LossRatio_ + ExpenseRatio_
+    formatString: 0.00%
+
+measure 'IBNR Estimate' =
+        VAR AvgTriangle_ = AVERAGE(LossRatio[loss_ratio])
+        VAR PremiumYTD_ = SUM(LossRatio[premium_earned])
+        RETURN PremiumYTD_ * AvgTriangle_ * 0.15  // 15% assumed IBNR factor
+    formatString: $#,0
+
+measure 'Premium YTD' =
+        TOTALYTD(SUM(LossRatio[premium_earned]), 'date_dim'[date_key])
+    formatString: $#,0
+
+measure 'Losses YTD' =
+        TOTALYTD(
+            SUMX(LossRatio, LossRatio[losses_paid] + LossRatio[losses_reserved]),
+            'date_dim'[date_key]
+        )
+    formatString: $#,0

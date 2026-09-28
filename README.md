@@ -12,7 +12,7 @@
 > Databricks Asset Bundles + Fabric deployment pipelines promote
 > through dev → staging → prod via Azure DevOps.
 
-**Status (2026-10-25):** Phases 9 + 10 shipped — Microsoft Purview governance (account + MI role grants on ADLS, custom Atlas lineage payloads per Databricks notebook, collection hierarchy + nightly scan schedules) + Azure Event Hubs streaming (Standard namespace, two hubs, dedicated consumer group, Entra-ID-only auth, Databricks Structured Streaming notebook writing bronze Delta with checkpoint, local emulator for CI).
+**Status (2026-10-25):** All 12 phases shipped. The final two (11+12) add a Power BI semantic model as reviewable TMDL (Direct Lake binding to `gold_monthly_loss_ratio`, Loss Ratio + Combined Ratio + IBNR measures mirrored in Python for CI parity) + Azure Monitor observability (one Log Analytics workspace, diagnostic settings on ADLS + Event Hubs, action-group-routed alerts for storage throttling and silent event hubs).
 
 ## Why this project
 
@@ -87,8 +87,8 @@ a reader with Azure credits can `terraform apply` them unchanged.
 | 8  | Fabric Warehouse + Direct Lake — gold materialized for Power BI | [docs/phase-07-08-fabric-lakehouse-warehouse.md](docs/phase-07-08-fabric-lakehouse-warehouse.md) | shipped |
 | 9  | Microsoft Purview — end-to-end lineage across Databricks + Fabric, PII classification | [docs/phase-09-10-purview-eventhubs.md](docs/phase-09-10-purview-eventhubs.md) | shipped |
 | 10 | Event Hubs streaming — real-time claim payments → Structured Streaming → Delta | [docs/phase-09-10-purview-eventhubs.md](docs/phase-09-10-purview-eventhubs.md) | shipped |
-| 11 | Power BI semantic model — loss ratio, combined ratio, IBNR dashboard | *coming soon*                            | planned     |
-| 12 | Observability + docs + exposures — Azure Monitor, hosted docs, actuarial calc notes | *coming soon*          | planned     |
+| 11 | Power BI semantic model — loss ratio, combined ratio, IBNR dashboard | [docs/phase-11-12-powerbi-observability.md](docs/phase-11-12-powerbi-observability.md) | shipped |
+| 12 | Observability + docs + exposures — Azure Monitor, hosted docs, actuarial calc notes | [docs/phase-11-12-powerbi-observability.md](docs/phase-11-12-powerbi-observability.md) | shipped |
 
 Each phase ships as one small, focused commit. See
 [`docs/`](docs/) for per-phase design + rationale.

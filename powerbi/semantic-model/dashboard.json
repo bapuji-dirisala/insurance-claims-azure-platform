@@ -1,0 +1,30 @@
+{
+  "name": "Claims Actuarial — Loss Ratio",
+  "pages": [
+    {
+      "name": "Executive Summary",
+      "ordinal": 1,
+      "visuals": [
+        {"type": "card",       "measure": "Loss Ratio",      "position": {"x": 0,  "y": 0,  "w": 4, "h": 2}},
+        {"type": "card",       "measure": "Combined Ratio",  "position": {"x": 4,  "y": 0,  "w": 4, "h": 2}},
+        {"type": "card",       "measure": "IBNR Estimate",   "position": {"x": 8,  "y": 0,  "w": 4, "h": 2}},
+        {"type": "lineChart",  "x": "month",   "y": ["Loss Ratio"],   "legend": "lob",
+         "position": {"x": 0,  "y": 2,  "w": 12, "h": 4}},
+        {"type": "barChart",   "x": "lob",     "y": ["Premium YTD", "Losses YTD"],
+         "position": {"x": 0,  "y": 6,  "w": 6,  "h": 4}},
+        {"type": "matrix",     "rows": ["lob"], "columns": ["month"], "values": ["Loss Ratio"],
+         "position": {"x": 6,  "y": 6,  "w": 6,  "h": 4}}
+      ]
+    },
+    {
+      "name": "By Line of Business",
+      "ordinal": 2,
+      "slicers": [{"field": "lob"}, {"field": "month"}],
+      "visuals": [
+        {"type": "lineChart",  "x": "month", "y": ["Premium YTD", "Losses YTD"]},
+        {"type": "waterfall",  "category": "month", "y": "losses_paid"}
+      ]
+    }
+  ],
+  "notes": "Semantic model is in model.tmdl — this file documents layout; publish with Tabular Editor or `fabric-cli` deploy."
+}

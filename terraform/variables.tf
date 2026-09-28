@@ -87,3 +87,21 @@ variable "eventhubs_producer_mi_principal_id" {
   type        = string
   default     = ""
 }
+
+variable "enable_observability" {
+  description = "Phase 12 — Log Analytics workspace + diagnostic settings + metric alerts + action group."
+  type        = bool
+  default     = false
+}
+
+variable "observability_retention_days" {
+  description = "Log Analytics data retention. 30 days is the minimum tier."
+  type        = number
+  default     = 30
+}
+
+variable "observability_ops_email" {
+  description = "Ops team email for the action group. Empty = no email receiver (webhook-only ops)."
+  type        = string
+  default     = ""
+}
