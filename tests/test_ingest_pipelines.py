@@ -90,6 +90,6 @@ def test_committed_adf_linked_services_reference_key_vault():
     sftp = json.loads((ADF_ROOT / "linkedServices" / "ls_sftp_partner.json").read_text())
     typ = sftp["properties"]["typeProperties"]
     for secret_field in ("hostKeyFingerprint", "userName", "privateKeyContent"):
-        assert (
-            typ[secret_field]["type"] == "AzureKeyVaultSecret"
-        ), f"{secret_field} must come from Key Vault, not be inline"
+        assert typ[secret_field]["type"] == "AzureKeyVaultSecret", (
+            f"{secret_field} must come from Key Vault, not be inline"
+        )
