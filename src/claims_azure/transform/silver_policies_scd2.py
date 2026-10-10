@@ -81,6 +81,7 @@ def bronze_to_silver_policies_scd2(
     """
     con = duckdb.connect(":memory:")
     df = con.execute(SCD2_SQL, [policies_path, endorsements_path, policies_path]).to_arrow_table()
+    assert df is not None
     silver_root = Path(silver_root)
     silver_root.mkdir(parents=True, exist_ok=True)
     import pyarrow.parquet as pq

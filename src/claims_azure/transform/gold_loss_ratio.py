@@ -51,6 +51,7 @@ def gold_loss_ratio_monthly(
 ) -> dict[str, Any]:
     con = duckdb.connect(":memory:")
     df = con.execute(LOSS_RATIO_SQL, [fact_claim_glob, premiums_glob]).to_arrow_table()
+    assert df is not None
     gold_root = Path(gold_root)
     gold_root.mkdir(parents=True, exist_ok=True)
     import pyarrow.parquet as pq

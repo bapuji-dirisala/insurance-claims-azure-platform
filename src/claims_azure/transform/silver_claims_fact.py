@@ -52,6 +52,7 @@ def bronze_to_silver_claims_fact(
     """Build silver.fact_claim locally."""
     con = duckdb.connect(":memory:")
     df = con.execute(CLAIM_FACT_SQL, [payments_path, claims_path, dim_policy_path]).to_arrow_table()
+    assert df is not None
     silver_root = Path(silver_root)
     silver_root.mkdir(parents=True, exist_ok=True)
     import pyarrow.parquet as pq
